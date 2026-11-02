@@ -3,10 +3,18 @@ const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const app = express();
-const port = Number(process.env.MOBILE_API_PORT || 3002);
+const port = Number(process.env.PORT || process.env.MOBILE_API_PORT || 3002);
 const farePerKm = Number(process.env.FARE_PER_KM || 50);
 const tokens = new Map();
-const db = mysql.createConnection({host: process.env.DB_HOST || "localhost", user: process.env.DB_USER || "root", password: process.env.DB_PASSWORD || "", database: process.env.DB_NAME || "bodalink"});
+//both applications must use the same environment variable names.
+//This is important because both will eventually receive the same database credentials from their respective Render service settings.
+const db = mysql.createConnection({
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "bodalink",
+  port: Number(process.env.DB_PORT || 3306)
+});
 db.connect(err => err ? console.error("Mobile API MySQL connection failed:", err.message) : console.log("Mobile API connected to bodalink."));
 function query(sql, params=[]) { return new Promise((resolve,reject)=>db.query(sql,params,(e,r)=>e?reject(e):resolve(r))); }
 app.use(express.json({limit:"1mb"})); app.use(express.urlencoded({extended:true}));
