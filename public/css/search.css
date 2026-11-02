@@ -1,0 +1,68 @@
+/* ==========================================================================
+   Search results page
+   ========================================================================== */
+
+.search-page-form {
+    display: flex;
+    gap: 0.6rem;
+    max-width: 640px;
+    margin-bottom: 2rem;
+}
+
+.search-page-form .input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.result-group {
+    margin-bottom: 2rem;
+}
+
+.result-group h2 {
+    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+}
+
+.result-list {
+    display: grid;
+    gap: 0.6rem;
+    max-width: 780px;
+    padding: 0;
+    list-style: none;
+}
+
+.result-list a {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.95rem 1.15rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.result-list a:hover {
+    border-color: var(--text-muted);
+    box-shadow: var(--shadow-sm);
+    background: var(--surface-2);
+    color: var(--text);
+}
+
+.result-list strong {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+}
+
+.result-list span {
+    color: var(--text-muted);
+    font-size: 0.97rem;
+}
+
+.search-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1rem;
+}

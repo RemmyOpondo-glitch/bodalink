@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("partials/head", {
+        title: heading + " – BodaLink",
+        description: message,
+        styles: ["status.css"],
+        noindex: true
+    }) %>
+</head>
+<body>
+
+    <%- include("partials/navbar") %>
+
+    <main id="main-content" tabindex="-1" class="status-page">
+        <div class="status-card">
+            <div class="notice-icon notice-icon--<%= variant %>" aria-hidden="true"><%= variant === "success" ? "✓" : "!" %></div>
+            <h1><%= heading %></h1>
+            <p class="lead"><%= message %></p>
+
+            <% if (details && details.length) { %>
+                <dl class="notice-details">
+                    <% details.forEach(function (row) { %>
+                        <div><dt><%= row.label %></dt><dd><%= row.value %></dd></div>
+                    <% }) %>
+                </dl>
+            <% } %>
+
+            <div class="notice-actions">
+                <% actions.forEach(function (action) { %>
+                    <a class="btn <%= action.primary ? "btn--primary" : "btn--ghost" %>" href="<%= action.href %>"><%= action.label %></a>
+                <% }) %>
+            </div>
+        </div>
+    </main>
+
+    <%- include("partials/footer") %>
+</body>
+</html>

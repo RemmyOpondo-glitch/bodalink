@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("partials/head", {
+        title: "Sign up – BodaLink",
+        description: "Create a BodaLink account with your phone number and start booking rides.",
+        styles: ["auth.css"]
+    }) %>
+</head>
+<body>
+
+    <%- include("partials/navbar") %>
+
+    <main id="main-content" tabindex="-1" class="auth-container">
+
+        <div class="auth-card">
+
+            <h1>Create account</h1>
+            <p class="lead">Sign up to start booking rides with BodaLink.</p>
+
+            <% if (typeof error !== "undefined" && error) { %>
+                <div class="alert alert--error" role="alert"><%= error %></div>
+            <% } %>
+
+            <%# enctype="multipart/form-data" lets multer receive the profile photo %>
+            <form action="/signup" method="POST" enctype="multipart/form-data">
+
+                <div class="field">
+                    <label for="phone">Phone number</label>
+                    <input type="tel" id="phone" name="phone" inputmode="tel" autocomplete="tel"
+                           placeholder="e.g. 0712 345 678" required
+                           value="<%= typeof phone !== 'undefined' ? phone : '' %>">
+                </div>
+
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" autocomplete="new-password" required>
+                </div>
+
+                <div class="field">
+                    <label for="profilePhoto">Profile photo <span class="hint">(optional, JPEG, PNG or WEBP, up to 2 MB)</span></label>
+                    <%# accept="image/*" tells the browser to offer image files only %>
+                    <input type="file" name="profilePhoto" id="profilePhoto" accept="image/jpeg,image/png,image/webp">
+                </div>
+
+                <button type="submit" class="btn btn--primary btn--block" data-loading-text="Creating account…">Sign up</button>
+
+            </form>
+
+            <p class="auth-footer">
+                Already have an account?
+                <a href="/login">Log in</a>
+            </p>
+
+        </div>
+
+    </main>
+
+    <%- include("partials/footer") %>
+
+</body>
+</html>

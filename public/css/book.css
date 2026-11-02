@@ -1,0 +1,69 @@
+/* ==========================================================================
+   Book a ride
+   ========================================================================== */
+
+.booking-container {
+    display: grid;
+    place-items: center;
+    min-height: calc(100vh - var(--header-h) - 160px);
+    padding: clamp(1.5rem, 5vw, 3rem) var(--gutter);
+}
+
+.booking-card {
+    width: 100%;
+    max-width: 520px;
+    padding: clamp(1.5rem, 4vw, 2.25rem);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+}
+
+.booking-card h1 {
+    font-size: 2rem;
+}
+
+.booking-subtitle {
+    margin: 0.4rem 0 1.75rem;
+    color: var(--text-muted);
+}
+
+.fare-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding: 0.9rem 1.1rem;
+    background: var(--surface-2);
+    border-left: 5px solid var(--accent);
+    border-radius: var(--radius-sm);
+}
+
+.fare-line span {
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.fare-line strong {
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    letter-spacing: -0.03em;
+}
+
+.location-row {
+    display: grid;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.location-row p {
+    min-height: 1.5em;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.booking-card .form-actions {
+    display: grid;
+    gap: 0.75rem;
+}

@@ -1,0 +1,45 @@
+<%
+    // Locals: title, description, styles (array of page CSS files), noindex
+    var _title = typeof title !== "undefined" && title ? title : "BodaLink";
+    var _description = typeof description !== "undefined" && description
+        ? description
+        : "Book verified boda boda riders with BodaLink. Fast, safe city rides.";
+    var _styles = typeof styles !== "undefined" && Array.isArray(styles) ? styles : [];
+    var _noindex = typeof noindex !== "undefined" && noindex;
+%>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= _title %></title>
+<meta name="description" content="<%= _description %>">
+<meta name="theme-color" content="#ffffff">
+<% if (_noindex) { %><meta name="robots" content="noindex"><% } %>
+
+<%# Runs before the page paints, so dark mode never flashes and CSS can tell JavaScript is on. %>
+<script>
+(function () {
+    var d = document.documentElement, t = null;
+    try { t = localStorage.getItem("bodalink-theme"); } catch (e) {}
+    if (t !== "light" && t !== "dark") {
+        t = (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+    }
+    d.setAttribute("data-theme", t);
+    d.classList.add("js");
+    try {
+        if (sessionStorage.getItem("bodalink-loaded") ||
+            (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) {
+            d.classList.add("no-loader");
+        }
+    } catch (e) {}
+})();
+</script>
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/figtree-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+
+<link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/footer.css">
+<link rel="stylesheet" href="/css/components.css">
+<% _styles.forEach(function (file) { %><link rel="stylesheet" href="/css/<%= file %>">
+<% }) %><link rel="stylesheet" href="/css/print.css" media="print">

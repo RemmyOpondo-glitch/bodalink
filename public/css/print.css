@@ -1,0 +1,334 @@
+/* ==========================================================================
+   Print stylesheet (loaded with media="print"): clean black-on-white pages,
+   no navigation or floating widgets, link addresses spelled out.
+   ========================================================================== */
+
+@page {
+    margin: 16mm 14mm;
+}
+
+/* Always print the light palette, even when dark mode is on. */
+:root,
+:root:not([data-theme]),
+:root[data-theme],
+:root[data-theme="dark"] {
+    color-scheme: light;
+
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #ffffff;
+    --text: #000000;
+    --text-muted: #333333;
+    --border: #888888;
+    --link: #000000;
+    --link-hover: #000000;
+    --success: #000000;
+    --success-bg: #ffffff;
+    --warning: #000000;
+    --warning-bg: #ffffff;
+    --danger: #000000;
+    --danger-bg: #ffffff;
+    --shadow-sm: none;
+    --shadow: none;
+    --shadow-lg: none;
+}
+
+html {
+    font-size: 11.5pt;
+}
+
+body {
+    display: block;
+    min-height: 0;
+    background: #ffffff !important;
+    color: #000000;
+    line-height: 1.45;
+}
+
+/* Hide everything that only makes sense on screen. */
+.skip-link,
+.scroll-progress,
+.page-loader,
+.nav-panel,
+.nav-tools,
+.fab-stack,
+.cookie-banner,
+.toast-region,
+dialog,
+.newsletter,
+.footer-brand,
+.footer-links,
+.hero-actions,
+.fare-card,
+.faq-toolbar,
+.code-copy,
+.password-toggle,
+.status-search,
+.status-links,
+.notice-actions,
+.search-page-form,
+.search-suggestions,
+.complete-trip-form,
+.history-table th:last-child,
+.history-table td:last-child,
+.btn {
+    display: none !important;
+}
+
+/* Header: logo only */
+.site-header {
+    position: static;
+    background: none;
+    border-bottom: 2px solid #000000;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+.navbar {
+    height: auto;
+    padding: 0 0 8pt;
+}
+
+.logo,
+.logo:hover {
+    color: #000000;
+}
+
+.logo-mark {
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid #000000;
+}
+
+/* Page content */
+.container,
+.page,
+.section {
+    max-width: none;
+    padding-inline: 0;
+}
+
+.section,
+.page {
+    padding-block: 12pt;
+}
+
+.section--alt {
+    background: none;
+    border: 0;
+}
+
+.hero {
+    background: none !important;
+    color: #000000;
+}
+
+.hero__inner {
+    display: block;
+    padding-block: 12pt;
+}
+
+.hero-content h1,
+.hero-content p {
+    color: #000000;
+}
+
+.lane-line {
+    height: 0;
+    border-top: 2px dashed #000000;
+    background: none;
+}
+
+h1,
+h2,
+h3,
+.section-heading {
+    color: #000000;
+    break-after: avoid;
+}
+
+.card,
+.service-card,
+.rider-card,
+.stat-card,
+.steps li,
+.result-list a,
+.notice-details,
+.faq__item,
+.history-table tr {
+    background: none;
+    border: 1px solid #888888;
+    box-shadow: none;
+    break-inside: avoid;
+}
+
+.service-cards,
+.steps,
+.history-stats {
+    gap: 8pt;
+}
+
+.safety {
+    grid-template-columns: 1fr 1fr;
+}
+
+.safety-image img {
+    max-height: 220pt;
+    box-shadow: none;
+}
+
+.rider-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* FAQ: every answer is printed (scripts also open the closed ones). */
+.faq__item summary::after {
+    display: none;
+}
+
+.faq__item summary {
+    padding: 8pt 10pt 2pt;
+}
+
+.faq__answer {
+    padding: 0 10pt 8pt;
+    color: #000000;
+}
+
+/* Trip history keeps its real table layout on paper. */
+.history-table-wrapper {
+    overflow: visible;
+    border: 0;
+    box-shadow: none;
+}
+
+.history-table,
+.history-table tbody,
+.history-table tr,
+.history-table td {
+    display: revert !important;
+    width: auto;
+}
+
+.history-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    border-collapse: collapse;
+}
+
+.history-table thead {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    display: table-header-group !important;
+}
+
+.history-table tr {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    break-inside: avoid;
+}
+
+.history-table th,
+.history-table td {
+    padding: 5pt 6pt;
+    background: none;
+    border: 1px solid #888888;
+    color: #000000;
+    font-size: 10pt;
+    text-align: left;
+}
+
+.history-table td::before {
+    display: none;
+}
+
+.badge {
+    padding: 0 4pt;
+    background: none;
+    border: 1px solid #000000;
+    border-radius: 3pt;
+    color: #000000;
+}
+
+.badge::before {
+    display: none;
+}
+
+.last-updated {
+    border-top: 1px solid #888888;
+    color: #000000;
+}
+
+/* Spell out where links go (internal links are left alone). */
+main a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    word-break: break-all;
+}
+
+/* Footer: contact details only */
+.footer {
+    margin-top: 12pt;
+    background: none;
+    color: #000000;
+    border-top: 2px solid #000000;
+}
+
+.footer-content {
+    display: block;
+    padding-block: 8pt;
+}
+
+.footer-contact,
+.footer-contact p,
+.footer-contact a,
+.footer h3 {
+    color: #000000;
+}
+
+.footer-contact a {
+    text-decoration: none;
+}
+
+.footer-bottom {
+    border: 0;
+    padding-block: 4pt;
+}
+
+.footer-bottom p {
+    color: #000000;
+}
+
+/* Code */
+.code-block pre,
+pre {
+    padding: 8pt;
+    background: none;
+    border: 1px solid #888888;
+    color: #000000;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* 404 / error pages */
+.status-page {
+    min-height: 0;
+}
+
+.error-code {
+    color: #000000;
+}
+
+.error-code__wheel {
+    animation: none;
+}
+
+a,
+a:hover {
+    color: #000000;
+}

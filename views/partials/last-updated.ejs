@@ -1,0 +1,11 @@
+<%
+    // Locals: updatedAt (ISO date string or Date), updatedLive (true for live data: shows date + time)
+    var _stamp = typeof updatedAt !== "undefined" && updatedAt ? new Date(updatedAt) : null;
+    if (_stamp && !isNaN(_stamp.getTime())) {
+        var _live = typeof updatedLive !== "undefined" && updatedLive;
+        var _format = new Intl.DateTimeFormat("en-KE", _live
+            ? { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Nairobi" }
+            : { dateStyle: "long", timeZone: "Africa/Nairobi" });
+%>
+<p class="last-updated"><%= _live ? "Data refreshed" : "Last updated" %> <time datetime="<%= _stamp.toISOString() %>"><%= _format.format(_stamp) %></time></p>
+<% } %>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("partials/head", {
+        title: "BodaLink – Ride swiftly. Travel safely.",
+        description: "Book a verified boda boda rider in minutes. See your fare before you confirm, then ride.",
+        styles: ["style.css"]
+    }) %>
+</head>
+<body>
+
+    <%- include("partials/navbar") %>
+
+    <main id="main-content" tabindex="-1">
+
+        <section class="hero">
+            <div class="container hero__inner">
+
+                <div class="hero-content">
+                    <h1>Ride swiftly.<br>Travel safely.</h1>
+                    <p>
+                        Your reliable city transport at the tap of a button. Fast, secure and
+                        professional urban mobility for the modern commuter.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="/trips" class="btn btn--primary btn--lg hero-btn">Book your ride</a>
+                        <a href="#how-it-works" class="btn btn--on-dark btn--lg">How it works</a>
+                    </div>
+                </div>
+
+                <form class="fare-card" id="fareEstimator" action="/trips" method="get" data-rate="<%= fareRate %>" data-no-loading>
+                    <h2>Estimate your fare</h2>
+                    <p class="fare-card__rate">Ksh <%= fareRate %> per kilometre</p>
+
+                    <div class="field">
+                        <label for="estimateDistance">Distance (km)</label>
+                        <input id="estimateDistance" name="distance" type="number" inputmode="decimal"
+                               min="0.1" max="999.99" step="0.1" placeholder="e.g. 5.5" required>
+                    </div>
+
+                    <div class="fare-card__result">
+                        <span>Your fare</span>
+                        <output id="estimateFare" for="estimateDistance">Ksh 0</output>
+                    </div>
+
+                    <button type="submit" class="btn btn--primary btn--block">Book this ride</button>
+                </form>
+
+            </div>
+            <div class="lane-line" aria-hidden="true"></div>
+        </section>
+
+        <section class="section section--alt" id="services" aria-labelledby="servicesTitle">
+            <div class="container">
+                <div class="section-heading">
+                    <h2 id="servicesTitle">Our services</h2>
+                    <p>Mobility solutions designed to keep you and your business moving across the city.</p>
+                </div>
+
+                <div class="service-cards">
+                    <article class="service-card">
+                        <div class="service-icon" aria-hidden="true">🛵</div>
+                        <h3>Quick Rides</h3>
+                        <p>Beat the traffic and arrive on time. Fast, reliable daily commutes with our vetted professional riders.</p>
+                        <a href="/trips">Book a ride</a>
+                    </article>
+
+                    <article class="service-card">
+                        <div class="service-icon" aria-hidden="true">🚚</div>
+                        <h3>Parcel Delivery</h3>
+                        <p>Secure and swift logistics for your packages, from pickup to drop-off.</p>
+                        <a href="#contact">Ask about parcels</a>
+                    </article>
+
+                    <article class="service-card">
+                        <div class="service-icon" aria-hidden="true">💼</div>
+                        <h3>Corporate</h3>
+                        <p>Dedicated mobility for businesses. Manage employee trips and deliveries in one place.</p>
+                        <a href="#contact">Talk to us</a>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="how-it-works" aria-labelledby="howTitle">
+            <div class="container">
+                <div class="section-heading">
+                    <h2 id="howTitle">How booking works</h2>
+                    <p>Three steps from where you are to where you&rsquo;re going.</p>
+                </div>
+
+                <ol class="steps">
+                    <li>
+                        <h3>Enter your trip</h3>
+                        <p>Give your pickup point, destination and distance. The fare shows before you confirm.</p>
+                    </li>
+                    <li>
+                        <h3>Get matched</h3>
+                        <p>Your booking goes to the first available rider on the Riders board.</p>
+                    </li>
+                    <li>
+                        <h3>Complete the trip</h3>
+                        <p>When you arrive, mark the trip complete in Trip History so the rider is free for the next passenger.</p>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="section section--alt" id="safety" aria-labelledby="safetyTitle">
+            <div class="container safety">
+
+                <div class="safety-image">
+                    <img src="/Images/safety.jpg" alt="A BodaLink rider wearing safety gear" width="1024" height="1024" loading="lazy" decoding="async">
+                </div>
+
+                <div class="safety-content">
+                    <h2 id="safetyTitle">Safety is our standard.</h2>
+                    <p>
+                        Your safety is our highest priority. Every BodaLink rider is carefully
+                        vetted and trained to provide a secure and reliable journey.
+                    </p>
+
+                    <div class="safety-features">
+                        <div class="safety-feature">
+                            <span aria-hidden="true">✓</span>
+                            <div>
+                                <h3>Verified Riders</h3>
+                                <p>Every rider goes through our verification process before joining BodaLink.</p>
+                            </div>
+                        </div>
+
+                        <div class="safety-feature">
+                            <span aria-hidden="true">✓</span>
+                            <div>
+                                <h3>Safe Journeys</h3>
+                                <p>We prioritize responsible riding and passenger safety on every trip.</p>
+                            </div>
+                        </div>
+
+                        <div class="safety-feature">
+                            <span aria-hidden="true">✓</span>
+                            <div>
+                                <h3>Reliable Support</h3>
+                                <p>Our platform makes it easy to get assistance whenever you need it.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="section" id="faq" aria-labelledby="faqTitle">
+            <div class="container">
+                <div class="section-heading">
+                    <h2 id="faqTitle">Frequently asked questions</h2>
+                    <p>Quick answers about fares, accounts and booking.</p>
+                </div>
+
+                <div class="faq-toolbar">
+                    <button type="button" class="btn btn--ghost btn--sm" data-faq-toggle-all hidden>Expand all</button>
+                </div>
+
+                <div class="faq">
+                    <% faqs.forEach(function (item) { %>
+                        <details class="faq__item" id="<%= item.id %>">
+                            <summary><%= item.question %></summary>
+                            <div class="faq__answer"><p><%= item.answer %></p></div>
+                        </details>
+                    <% }) %>
+                </div>
+
+                <%- include("partials/last-updated", { updatedAt: updatedAt }) %>
+            </div>
+        </section>
+
+    </main>
+
+    <%- include("partials/footer") %>
+
+    <script>
+    /* Home page fare estimator (the booking page uses the same rate). */
+    (function () {
+        var form = document.getElementById("fareEstimator");
+        if (!form) return;
+        var input = document.getElementById("estimateDistance");
+        var output = document.getElementById("estimateFare");
+        var rate = Number(form.getAttribute("data-rate")) || 50;
+
+        input.addEventListener("input", function () {
+            var km = Number(input.value);
+            if (!isFinite(km) || km <= 0) { output.textContent = "Ksh 0"; return; }
+            var fare = Math.round(km * rate * 100) / 100;
+            output.textContent = "Ksh " + fare.toLocaleString("en-KE", { maximumFractionDigits: 2 });
+        });
+    })();
+    </script>
+</body>
+</html>

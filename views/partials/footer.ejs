@@ -1,0 +1,155 @@
+<%
+    var _contact = typeof contact !== "undefined" ? contact : {
+        phoneDisplay: "+254 700 000 000", phoneTel: "+254700000000",
+        whatsapp: "254700000000", email: "support@bodalink.com", location: "Nairobi, Kenya"
+    };
+    function _utm(url, placement) { return typeof utm === "function" ? utm(url, placement) : url; }
+    var _nl = typeof newsletterStatus !== "undefined" ? newsletterStatus : null;
+    var _mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(_contact.location);
+    var _waUrl = "https://wa.me/" + _contact.whatsapp + "?text=" + encodeURIComponent("Hello BodaLink, I need help with");
+%>
+<footer class="footer">
+    <div class="footer-inner">
+
+        <section class="newsletter" id="newsletter" aria-labelledby="newsletterTitle">
+            <div class="newsletter__copy">
+                <h2 id="newsletterTitle">Stay in the loop</h2>
+                <p>Updates on new services and safety tips, straight to your inbox.</p>
+            </div>
+
+            <div class="newsletter__box">
+                <form class="newsletter__form" action="/newsletter" method="post" data-newsletter novalidate <%= _nl === "success" ? "hidden" : "" %>>
+                    <label class="visually-hidden" for="newsletterEmail">Email address</label>
+                    <div class="newsletter__row">
+                        <input class="newsletter__input" id="newsletterEmail" type="email" name="email"
+                               placeholder="you@example.com" autocomplete="email" required
+                               aria-describedby="newsletterError"
+                               <%- _nl === "invalid" ? 'aria-invalid="true"' : "" %>>
+                        <button class="btn btn--primary" type="submit">Subscribe</button>
+                    </div>
+                    <div class="newsletter__trap" aria-hidden="true">
+                        <label>Leave this field empty <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+                    </div>
+                    <p class="newsletter__error" id="newsletterError" data-newsletter-error role="alert"><%
+                        if (_nl === "invalid") { %>Enter a valid email address, like name@example.com.<% }
+                        else if (_nl === "error") { %>Something went wrong on our side. Please try again.<% }
+                    %></p>
+                </form>
+
+                <div class="newsletter__success" data-newsletter-success role="status" tabindex="-1" <%= _nl === "success" ? "" : "hidden" %>>
+                    <span class="newsletter__success-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+                    </span>
+                    <p>
+                        <strong>You&rsquo;re subscribed.</strong>
+                        <span>Thanks for joining. We&rsquo;ll email you when there&rsquo;s news.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <div class="footer-content">
+
+            <div class="footer-brand">
+                <h2>BodaLink</h2>
+                <p>Reliable, safe and convenient urban mobility for everyone.</p>
+            </div>
+
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <a href="/">Home</a>
+                <a href="/trips">Book Ride</a>
+                <a href="/history">Trip History</a>
+                <a href="/riders">Riders</a>
+                <a href="/search">Search</a>
+            </div>
+
+            <div class="footer-links">
+                <h3>Account</h3>
+                <% if (typeof user !== "undefined" && user) { %>
+                    <a href="/profile">My Profile</a>
+                    <a href="/logout">Logout</a>
+                <% } else { %>
+                    <a href="/login">Login</a>
+                    <a href="/signup">Sign up</a>
+                <% } %>
+            </div>
+
+            <div class="footer-contact" id="contact">
+                <h3>Contact</h3>
+                <a href="tel:<%= _contact.phoneTel %>"><%= _contact.phoneDisplay %></a>
+                <a href="mailto:<%= _contact.email %>"><%= _contact.email %></a>
+                <a href="<%= _utm(_mapsUrl, "footer") %>" target="_blank" rel="noopener noreferrer"><%= _contact.location %> (open map)</a>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2026 BodaLink. All rights reserved.</p>
+    </div>
+</footer>
+
+<%# ---------- Floating widgets, modals and the site script ---------- %>
+
+<div class="fab-stack">
+    <button class="back-to-top" id="backToTop" type="button" aria-label="Back to top" title="Back to top">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 15 7-7 7 7"/></svg>
+    </button>
+
+    <div class="contact-fab">
+        <div class="contact-panel" id="contactPanel" role="region" aria-labelledby="contactPanelTitle" hidden>
+            <h2 id="contactPanelTitle">How can we help?</h2>
+            <ul>
+                <li><a href="tel:<%= _contact.phoneTel %>">Call&nbsp;us<small><%= _contact.phoneDisplay %></small></a></li>
+                <li><a href="<%= _utm(_waUrl, "contact_button") %>" target="_blank" rel="noopener noreferrer">WhatsApp<small>Chat with support</small></a></li>
+                <li><a href="mailto:<%= _contact.email %>">Email<small><%= _contact.email %></small></a></li>
+            </ul>
+        </div>
+
+        <button class="contact-fab__button" id="contactToggle" type="button" aria-label="Contact us" aria-expanded="false" aria-controls="contactPanel">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span class="contact-fab__label">Contact us</span>
+        </button>
+    </div>
+</div>
+
+<div class="cookie-banner" id="cookieBanner" role="region" aria-label="Cookie notice" hidden>
+    <p>BodaLink uses one cookie to keep you logged in and remembers your light or dark choice in your browser. We don&rsquo;t use advertising cookies.</p>
+    <button class="btn btn--primary btn--sm" id="cookieAccept" type="button">Got it</button>
+</div>
+
+<dialog class="modal" id="confirmDialog" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+    <div class="modal__body">
+        <span class="modal__icon" aria-hidden="true">!</span>
+        <h2 class="modal__title" id="confirmTitle">Are you sure?</h2>
+        <p class="modal__message" id="confirmMessage"></p>
+    </div>
+    <div class="modal__actions">
+        <button class="btn btn--ghost" type="button" data-modal-cancel>Cancel</button>
+        <button class="btn btn--danger" type="button" data-modal-confirm>Confirm</button>
+    </div>
+</dialog>
+
+<dialog class="modal search-dialog" id="searchDialog" aria-label="Search BodaLink">
+    <form class="search-form" action="/search" method="get" role="search" data-no-loading>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <label class="visually-hidden" for="searchInput">Search BodaLink</label>
+        <input class="search-input" id="searchInput" name="q" type="text" role="searchbox" inputmode="search" maxlength="100"
+               placeholder="Search pages, FAQs, riders, trips" autocomplete="off" enterkeyhint="search">
+        <%# First submit button = what Enter triggers. Visually hidden; the Close button below must not be the default. %>
+        <button class="visually-hidden" type="submit" tabindex="-1">Search</button>
+        <button class="icon-btn" type="submit" formmethod="dialog" formnovalidate aria-label="Close search" title="Close (Esc)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+    </form>
+    <div class="search-body">
+        <p class="search-status" id="searchStatus" role="status" aria-live="polite"></p>
+        <ul class="search-results" id="searchResults"></ul>
+        <a class="search-all" id="searchAll" href="/search" hidden>See all results</a>
+    </div>
+</dialog>
+
+<div class="toast-region" id="toastRegion" role="status" aria-live="polite"></div>
+
+<script src="/js/site.js" defer></script>

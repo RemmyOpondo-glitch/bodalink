@@ -1,0 +1,790 @@
+/* ==========================================================================
+   Shared components: page loader, floating buttons, cookie banner, modals,
+   search, FAQ, toast, code copy, password toggle, badges, last-updated
+   ========================================================================== */
+
+/* ---------- Page loader (first visit of a browser session only) ---------- */
+
+.page-loader {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    place-items: center;
+    background: var(--bg);
+}
+
+.js:not(.no-loader) .page-loader {
+    display: grid;
+    /* Safety net: if scripts fail, the loader still gets out of the way after 4 seconds. */
+    animation: loaderFailsafe 0.01s linear 4s forwards;
+}
+
+.page-loader.is-done {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+}
+
+.page-loader__inner {
+    display: grid;
+    justify-items: center;
+    gap: 1.25rem;
+}
+
+.page-loader .logo-mark {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    font-size: 2.2rem;
+    animation: loaderBob 0.6s ease-in-out infinite alternate;
+}
+
+.page-loader__road {
+    width: 170px;
+    height: 6px;
+    background: repeating-linear-gradient(90deg, var(--accent) 0 18px, transparent 18px 34px);
+    background-size: 34px 100%;
+    animation: loaderRoad 0.5s linear infinite;
+}
+
+@keyframes loaderBob {
+    to {
+        transform: translateY(-8px) rotate(-4deg);
+    }
+}
+
+@keyframes loaderRoad {
+    to {
+        background-position: -34px 0;
+    }
+}
+
+@keyframes loaderFailsafe {
+    to {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+}
+
+/* ---------- Floating action buttons ---------- */
+
+.fab-stack {
+    position: fixed;
+    right: 1.25rem;
+    bottom: calc(1.25rem + var(--banner-h, 0px));
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.75rem;
+    transition: bottom 0.2s ease;
+}
+
+.back-to-top {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s,
+        background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.back-to-top.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition-delay: 0s;
+}
+
+.back-to-top:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
+}
+
+.back-to-top:active {
+    transform: scale(0.94);
+}
+
+.back-to-top svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.contact-fab {
+    position: relative;
+}
+
+.contact-fab__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 54px;
+    padding: 0 1.25rem 0 1rem;
+    background: var(--accent);
+    color: var(--on-accent);
+    border: 0;
+    border-radius: 999px;
+    box-shadow: var(--shadow);
+    font-weight: 800;
+    transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.contact-fab__button:hover {
+    background: var(--accent-hover);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.contact-fab__button:active {
+    background: var(--accent-active);
+    transform: translateY(0);
+}
+
+.contact-fab__button svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.contact-panel {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 0.75rem);
+    width: min(300px, calc(100vw - 2.5rem));
+    padding: 0.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    animation: panelIn 0.18s ease-out;
+}
+
+.contact-panel h2 {
+    padding: 0.6rem 0.75rem 0.35rem;
+    font-size: 1.05rem;
+}
+
+.contact-panel ul {
+    padding: 0;
+    list-style: none;
+}
+
+.contact-panel a {
+    display: flex;
+    flex-direction: column;
+    padding: 0.65rem 0.75rem;
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+}
+
+.contact-panel a small {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.contact-panel a:hover {
+    background: var(--surface-2);
+    color: var(--text);
+}
+
+@keyframes panelIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ---------- Cookie banner ---------- */
+
+.cookie-banner {
+    position: fixed;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 130;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: min(560px, calc(100vw - 2rem));
+    padding: 1rem 1.15rem;
+    background: var(--ink);
+    color: var(--on-ink);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    animation: panelIn 0.3s ease-out;
+}
+
+.cookie-banner p {
+    max-width: none;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.cookie-banner .btn {
+    flex-shrink: 0;
+}
+
+/* ---------- Modals (confirmation + search) ---------- */
+
+dialog.modal {
+    width: min(92vw, 440px);
+    max-height: min(90vh, 640px);
+    padding: 0;
+    overflow: auto;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+dialog.modal[open] {
+    animation: modalIn 0.18s ease-out;
+}
+
+dialog.modal::backdrop {
+    background: rgba(6, 9, 16, 0.62);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+.modal__body {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem 1rem;
+    padding: 1.5rem 1.5rem 1rem;
+}
+
+.modal__icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    grid-row: span 2;
+    border-radius: 50%;
+    background: var(--danger-bg);
+    color: var(--danger);
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.modal__title {
+    align-self: end;
+    font-size: 1.3rem;
+}
+
+.modal__message {
+    color: var(--text-muted);
+}
+
+.modal__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    padding: 0.75rem 1.5rem 1.5rem;
+}
+
+/* ---------- Search dialog ---------- */
+
+dialog.search-dialog {
+    width: min(94vw, 640px);
+    margin: 10vh auto auto;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0.75rem 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.search-form > svg {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    fill: none;
+    stroke: var(--text-muted);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.search-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0.4rem 0.25rem;
+    background: transparent;
+    border: 0;
+    color: var(--text);
+    font-size: 1.15rem;
+}
+
+.search-input:focus-visible {
+    outline: none; /* the whole form row shows focus below */
+}
+
+.search-form:focus-within {
+    box-shadow: inset 0 -3px 0 var(--accent);
+}
+
+.search-input::placeholder {
+    color: var(--text-muted);
+}
+
+.search-input::-webkit-search-cancel-button {
+    display: none;
+}
+
+.search-body {
+    max-height: min(60vh, 440px);
+    padding: 0.5rem;
+    overflow-y: auto;
+}
+
+.search-status {
+    padding: 0.5rem 0.75rem;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+}
+
+.search-results {
+    padding: 0;
+    list-style: none;
+}
+
+.search-result {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.7rem 0.75rem;
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+}
+
+.search-result:hover,
+.search-result:focus-visible {
+    background: var(--surface-2);
+    color: var(--text);
+}
+
+.search-result:focus-visible {
+    outline-offset: -3px;
+}
+
+.search-result__type {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.search-result__title {
+    font-weight: 700;
+}
+
+.search-result__snippet {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.search-all {
+    display: block;
+    margin: 0.25rem 0.25rem 0.25rem;
+    padding: 0.7rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+}
+
+.search-all:hover {
+    background: var(--surface-2);
+}
+
+.skeleton-row {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.8rem 0.75rem;
+}
+
+.skeleton {
+    display: block;
+    height: 0.9rem;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--surface-2) 25%, var(--border) 50%, var(--surface-2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.2s ease-in-out infinite;
+}
+
+.skeleton--short {
+    width: 35%;
+}
+
+.skeleton--long {
+    width: 80%;
+}
+
+@keyframes shimmer {
+    to {
+        background-position: -200% 0;
+    }
+}
+
+/* ---------- FAQ ---------- */
+
+.faq-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    max-width: 780px;
+    margin-bottom: 0.75rem;
+}
+
+.faq {
+    display: grid;
+    gap: 0.7rem;
+    max-width: 780px;
+}
+
+.faq__item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.faq__item[open] {
+    border-color: var(--text-muted);
+    box-shadow: var(--shadow-sm);
+}
+
+.faq__item summary {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.05rem 1.25rem;
+    border-radius: var(--radius);
+    font-family: var(--font-display);
+    font-size: 1.12rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    list-style: none;
+    transition: background-color 0.15s ease;
+}
+
+.faq__item summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq__item summary:hover {
+    background: var(--surface-2);
+}
+
+.faq__item summary:active {
+    background: var(--border);
+}
+
+.faq__item summary::after {
+    content: "";
+    flex-shrink: 0;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-top: 0.4rem;
+    border-right: 2.5px solid var(--text-muted);
+    border-bottom: 2.5px solid var(--text-muted);
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+}
+
+.faq__item[open] summary::after {
+    transform: translateY(0.25rem) rotate(-135deg);
+}
+
+.faq__answer {
+    padding: 0 1.25rem 1.25rem;
+    color: var(--text-muted);
+}
+
+/* Smooth open/close where the browser supports it; instant everywhere else. */
+@supports (interpolate-size: allow-keywords) and selector(::details-content) {
+    :root {
+        interpolate-size: allow-keywords;
+    }
+
+    .faq__item::details-content {
+        block-size: 0;
+        overflow: hidden;
+        transition: block-size 0.25s ease, content-visibility 0.25s allow-discrete;
+    }
+
+    .faq__item[open]::details-content {
+        block-size: auto;
+    }
+}
+
+/* ---------- Toast ---------- */
+
+.toast-region {
+    position: fixed;
+    left: 50%;
+    bottom: 1.25rem;
+    z-index: 140;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.toast {
+    padding: 0.7rem 1.1rem;
+    background: var(--ink);
+    color: var(--on-ink);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    box-shadow: var(--shadow-lg);
+    font-weight: 600;
+    animation: panelIn 0.2s ease-out;
+}
+
+/* ---------- Code snippets with copy button ---------- */
+
+.code-block {
+    position: relative;
+    margin-block: 1rem;
+}
+
+.code-block pre {
+    margin: 0;
+    padding: 2.9rem 1.1rem 1.1rem;
+    overflow-x: auto;
+    background: var(--ink);
+    color: var(--on-ink);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    tab-size: 4;
+}
+
+.code-copy {
+    position: absolute;
+    top: 0.55rem;
+    right: 0.55rem;
+    min-height: 34px;
+    padding: 0.25rem 0.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.code-copy:hover {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: #ffffff;
+}
+
+.code-copy:active {
+    background: rgba(255, 255, 255, 0.32);
+}
+
+.code-copy:focus-visible {
+    outline-color: #8db4ff;
+}
+
+.code-copy.is-copied {
+    background: #5fd49a;
+    border-color: #5fd49a;
+    color: #06291a;
+}
+
+/* ---------- Password visibility toggle ---------- */
+
+.password-field {
+    position: relative;
+}
+
+.password-field input {
+    padding-right: 3.1rem !important;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0.35rem;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: transparent;
+    color: var(--text-muted);
+    border: 0;
+    border-radius: var(--radius-sm);
+    transform: translateY(-50%);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.password-toggle:hover {
+    background: var(--surface-2);
+    color: var(--text);
+}
+
+.password-toggle:active {
+    background: var(--border);
+}
+
+.password-toggle svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.password-toggle .icon-eye-off {
+    display: none;
+}
+
+.password-toggle[aria-pressed="true"] .icon-eye {
+    display: none;
+}
+
+.password-toggle[aria-pressed="true"] .icon-eye-off {
+    display: block;
+}
+
+/* ---------- Status badges ---------- */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.badge::before {
+    content: "";
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.badge--pending,
+.badge--busy {
+    background: var(--warning-bg);
+    color: var(--warning);
+}
+
+.badge--completed,
+.badge--available {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+/* ---------- Last updated ---------- */
+
+.last-updated {
+    max-width: none;
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    border-top: 2px dashed var(--border);
+    color: var(--text-muted);
+    font-size: 0.93rem;
+}
+
+/* ---------- Small screens ---------- */
+
+@media screen and (max-width: 520px) {
+    .cookie-banner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .fab-stack {
+        right: 0.9rem;
+    }
+
+    .contact-fab__label {
+        display: none;
+    }
+
+    .contact-fab__button {
+        width: 56px;
+        padding: 0;
+        justify-content: center;
+    }
+
+    .modal__body {
+        padding: 1.25rem 1.25rem 0.75rem;
+    }
+
+    .modal__actions {
+        padding: 0.75rem 1.25rem 1.25rem;
+    }
+
+    .modal__actions .btn {
+        flex: 1 1 auto;
+    }
+}

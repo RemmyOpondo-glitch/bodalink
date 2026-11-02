@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("partials/head", {
+        title: "Log in – BodaLink",
+        description: "Log in to your BodaLink account to book rides and see your trip history.",
+        styles: ["auth.css"]
+    }) %>
+</head>
+<body>
+
+    <%- include("partials/navbar") %>
+
+    <main id="main-content" tabindex="-1" class="auth-container">
+
+        <div class="auth-card">
+
+            <h1>Log in</h1>
+            <p class="lead">Welcome back. Log in to book your next ride.</p>
+
+            <% if (typeof error !== "undefined" && error) { %>
+                <div class="alert alert--error" role="alert"><%= error %></div>
+            <% } %>
+
+            <form action="/login" method="POST">
+
+                <div class="field">
+                    <label for="phone">Phone number</label>
+                    <input type="tel" id="phone" name="phone" inputmode="tel" autocomplete="tel"
+                           placeholder="e.g. 0712 345 678" required
+                           value="<%= typeof phone !== 'undefined' ? phone : '' %>">
+                </div>
+
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" autocomplete="current-password" required>
+                </div>
+
+                <button type="submit" class="btn btn--primary btn--block" data-loading-text="Logging in…">Log in</button>
+
+            </form>
+
+            <p class="auth-footer">
+                Don&rsquo;t have an account?
+                <a href="/signup">Sign up</a>
+            </p>
+
+        </div>
+
+    </main>
+
+    <%- include("partials/footer") %>
+
+</body>
+</html>

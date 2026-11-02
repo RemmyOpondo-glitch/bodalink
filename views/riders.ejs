@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("partials/head", {
+        title: "Riders board – BodaLink",
+        description: "See which BodaLink riders are available right now and which stage they work from.",
+        styles: ["riders.css"],
+        noindex: true
+    }) %>
+</head>
+<body>
+    <%- include("partials/navbar") %>
+
+    <main id="main-content" tabindex="-1" class="container page">
+
+        <section class="page-head">
+            <h1>Available boda boda riders</h1>
+            <p>Riders show as busy while they are on a trip.</p>
+        </section>
+
+        <% if (riders.length === 0) { %>
+            <p class="empty-state">No riders are registered yet. Check back soon.</p>
+        <% } else { %>
+            <section class="rider-grid" aria-label="Riders">
+                <% riders.forEach(function (rider) { %>
+                    <article class="rider-card">
+                        <div class="rider-card-top">
+                            <h2><%= rider.name %></h2>
+                            <span class="badge badge--<%= rider.available ? "available" : "busy" %>"><%= rider.available ? "Available" : "Busy" %></span>
+                        </div>
+                        <p class="stage"><strong>Stage:</strong> <%= rider.stage %></p>
+                    </article>
+                <% }) %>
+            </section>
+        <% } %>
+
+        <%- include("partials/last-updated", { updatedAt: updatedAt, updatedLive: true }) %>
+
+    </main>
+
+    <%- include("partials/footer") %>
+</body>
+</html>

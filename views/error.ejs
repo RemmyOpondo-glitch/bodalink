@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("partials/head", {
+        title: "Something went wrong – BodaLink",
+        description: "Something went wrong.",
+        styles: ["status.css"],
+        noindex: true
+    }) %>
+</head>
+<body>
+
+    <%- include("partials/navbar") %>
+
+    <main id="main-content" tabindex="-1" class="status-page">
+        <div class="status-card">
+            <p class="error-code" aria-hidden="true"><span><%= status %></span></p>
+            <h1><%= status >= 500 ? "Something went wrong on our side" : "We couldn\u2019t complete that" %></h1>
+            <p class="lead"><%= message %></p>
+
+            <div class="lane-line" aria-hidden="true"></div>
+
+            <div class="status-links">
+                <button class="btn btn--primary btn--sm" type="button" onclick="history.back()">Go back</button>
+                <a class="btn btn--ghost btn--sm" href="/">Home</a>
+            </div>
+        </div>
+    </main>
+
+    <%- include("partials/footer") %>
+</body>
+</html>

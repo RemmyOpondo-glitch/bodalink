@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("partials/head", {
+        title: "My profile – BodaLink",
+        description: "Your BodaLink account details.",
+        styles: ["profile.css"],
+        noindex: true
+    }) %>
+</head>
+<body>
+
+    <%- include("partials/navbar") %>
+
+    <main id="main-content" tabindex="-1" class="container page">
+
+        <section class="card profile-card">
+            <% if (user.profile_photo) { %>
+                <img class="profile-card__photo" src="/uploads/<%= user.profile_photo %>" alt="Your profile photo" width="132" height="132">
+            <% } else { %>
+                <div class="profile-card__placeholder" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+                </div>
+            <% } %>
+
+            <h1 class="visually-hidden">My profile</h1>
+            <span class="profile-card__label">Phone number</span>
+            <span class="profile-card__phone"><%= user.phone %></span>
+            <% if (!user.profile_photo) { %>
+                <p class="profile-card__note">No profile photo uploaded.</p>
+            <% } %>
+
+            <div class="profile-card__actions">
+                <a href="/trips" class="btn btn--primary">Book a ride</a>
+                <a href="/history" class="btn btn--ghost">View trip history</a>
+                <a href="/logout" class="btn btn--ghost">Log out</a>
+            </div>
+        </section>
+
+    </main>
+
+    <%- include("partials/footer") %>
+</body>
+</html>

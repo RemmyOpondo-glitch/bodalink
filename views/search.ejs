@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("partials/head", {
+        title: (query ? "Search: " + query : "Search") + " – BodaLink",
+        description: "Search BodaLink pages, FAQs, riders and your trips.",
+        styles: ["search.css"],
+        noindex: true
+    }) %>
+</head>
+<body>
+
+    <%- include("partials/navbar") %>
+
+    <main id="main-content" tabindex="-1" class="container page">
+
+        <section class="page-head">
+            <h1>Search</h1>
+            <p>Find pages, answers, riders and your own trips.</p>
+        </section>
+
+        <form class="search-page-form" action="/search" method="get" role="search" data-no-loading>
+            <label class="visually-hidden" for="pageSearch">Search BodaLink</label>
+            <input class="input" id="pageSearch" type="search" name="q" maxlength="100"
+                   value="<%= query %>" placeholder="Try &ldquo;fare&rdquo; or &ldquo;complete trip&rdquo;" autocomplete="off">
+            <button class="btn btn--primary" type="submit">Search</button>
+        </form>
+
+        <% if (!query) { %>
+            <p class="lead">Type at least two letters to search. Popular searches:</p>
+            <div class="search-suggestions">
+                <a class="btn btn--ghost btn--sm" href="/search?q=fare">Fare</a>
+                <a class="btn btn--ghost btn--sm" href="/search?q=safety">Safety</a>
+                <a class="btn btn--ghost btn--sm" href="/search?q=complete">Complete trip</a>
+                <a class="btn btn--ghost btn--sm" href="/search?q=contact">Contact</a>
+            </div>
+        <% } else if (tooShort) { %>
+            <p class="lead">Type at least two letters to search.</p>
+        <% } else if (total === 0) { %>
+            <section class="empty-state" role="status">
+                <h2>No results for &ldquo;<%= query %>&rdquo;</h2>
+                <p>Check the spelling or try a simpler word like &ldquo;fare&rdquo;, &ldquo;riders&rdquo; or &ldquo;safety&rdquo;.</p>
+            </section>
+        <% } else { %>
+            <p role="status" class="page-head"><%= total %> <%= total === 1 ? "result" : "results" %> for &ldquo;<%= query %>&rdquo;</p>
+
+            <% groups.forEach(function (group) { %>
+                <section class="result-group" aria-labelledby="group-<%= group.slug %>">
+                    <h2 id="group-<%= group.slug %>"><%= group.label %></h2>
+                    <ul class="result-list">
+                        <% group.items.forEach(function (item) { %>
+                            <li>
+                                <a href="<%= item.url %>">
+                                    <strong><%= item.title %></strong>
+                                    <% if (item.snippet) { %><span><%= item.snippet %></span><% } %>
+                                </a>
+                            </li>
+                        <% }) %>
+                    </ul>
+                </section>
+            <% }) %>
+        <% } %>
+
+    </main>
+
+    <%- include("partials/footer") %>
+</body>
+</html>

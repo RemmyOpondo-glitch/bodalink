@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("partials/head", {
+        title: "Book a ride – BodaLink",
+        description: "Enter your pickup, destination and distance, then confirm your boda boda booking.",
+        styles: ["book.css"],
+        noindex: true
+    }) %>
+</head>
+<body>
+
+    <%- include("partials/navbar") %>
+
+    <main id="main-content" tabindex="-1" class="booking-container">
+        <div class="booking-card">
+            <h1>Book a ride</h1>
+            <p class="booking-subtitle">Request an available rider for quick transit.</p>
+
+            <p class="alert alert--error form-error" id="bookingError" role="alert" hidden></p>
+
+            <form action="/book" method="POST" id="bookingForm">
+
+                <div class="field">
+                    <label for="pickup">Pickup</label>
+                    <input type="text" name="pickup" id="pickup" placeholder="e.g. Langas" maxlength="100" autocomplete="off" required>
+                </div>
+
+                <div class="field">
+                    <label for="destination">Destination</label>
+                    <input type="text" name="destination" id="destination" placeholder="e.g. Kimumu" maxlength="100" autocomplete="off" required>
+                </div>
+
+                <div class="field">
+                    <label for="distance">Distance (km)</label>
+                    <input type="number" name="distance" id="distance" placeholder="e.g. 5.5" inputmode="decimal"
+                           min="0.1" max="999.99" step="0.1" required>
+                </div>
+
+                <div class="fare-line">
+                    <span>Estimated fare</span>
+                    <strong aria-live="polite">Ksh <span id="fare" data-rate="<%= fareRate %>">0</span></strong>
+                </div>
+
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+
+                <div class="location-row">
+                    <button type="button" class="btn btn--secondary" id="locationBtn">Get my location</button>
+                    <p id="locationMessage" role="status"></p>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn--primary btn--lg btn--block" data-loading-text="Booking…">Confirm &amp; book ride</button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+    <script src="/script.js"></script>
+
+    <%- include("partials/footer") %>
+</body>
+</html>

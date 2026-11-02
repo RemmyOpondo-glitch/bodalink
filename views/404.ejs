@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("partials/head", {
+        title: "Page not found – BodaLink",
+        description: "We couldn't find that page.",
+        styles: ["status.css"],
+        noindex: true
+    }) %>
+</head>
+<body>
+
+    <%- include("partials/navbar") %>
+
+    <main id="main-content" tabindex="-1" class="status-page">
+        <div class="status-card">
+
+            <p class="error-code" aria-hidden="true">
+                <span>4</span>
+                <span class="error-code__wheel">
+                    <svg viewBox="0 0 100 100" fill="none">
+                        <circle cx="50" cy="50" r="44" stroke="currentColor" stroke-width="10"/>
+                        <circle cx="50" cy="50" r="9" fill="var(--accent)"/>
+                        <path d="M50 14v22M50 64v22M14 50h22M64 50h22M24.5 24.5l15.5 15.5M60 60l15.5 15.5M75.5 24.5 60 40M40 60 24.5 75.5" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+                    </svg>
+                </span>
+                <span>4</span>
+            </p>
+
+            <h1>We couldn&rsquo;t find that page</h1>
+            <p class="lead">The link may be broken, or the page may have moved. Search the site or pick up from one of the links below.</p>
+            <% if (typeof requestedPath !== "undefined" && requestedPath) { %>
+                <code class="status-path"><%= requestedPath %></code>
+            <% } %>
+
+            <div class="lane-line" aria-hidden="true"></div>
+
+            <form class="status-search" action="/search" method="get" role="search" data-no-loading>
+                <label class="visually-hidden" for="notFoundSearch">Search BodaLink</label>
+                <input class="input" id="notFoundSearch" type="search" name="q" maxlength="100" placeholder="Search BodaLink" autocomplete="off">
+                <button class="btn btn--primary" type="submit">Search</button>
+            </form>
+
+            <div class="status-links">
+                <a class="btn btn--ghost btn--sm" href="/">Home</a>
+                <a class="btn btn--ghost btn--sm" href="/trips">Book a ride</a>
+                <a class="btn btn--ghost btn--sm" href="/history">Trip history</a>
+                <a class="btn btn--ghost btn--sm" href="/riders">Riders</a>
+            </div>
+
+        </div>
+    </main>
+
+    <%- include("partials/footer") %>
+</body>
+</html>

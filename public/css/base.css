@@ -1,0 +1,644 @@
+/* ==========================================================================
+   BodaLink base styles: fonts, design tokens (light + dark), reset, type,
+   buttons, forms and shared layout helpers. Loaded on every page.
+   ========================================================================== */
+
+@font-face {
+    font-family: "Bricolage Grotesque";
+    src: url("/fonts/bricolage-grotesque-latin-wght-normal.woff2") format("woff2");
+    font-weight: 200 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Figtree";
+    src: url("/fonts/figtree-latin-wght-normal.woff2") format("woff2");
+    font-weight: 300 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ---------- Design tokens ---------- */
+
+:root {
+    color-scheme: light;
+
+    --font-display: "Bricolage Grotesque", "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --surface-2: #eceff3;
+    --text: #0f1722;
+    --text-muted: #4a5668;
+    --border: #d5dbe3;
+
+    --ink: #0f1722;          /* footer, cookie banner, code blocks */
+    --on-ink: #e9eef6;
+    --on-ink-muted: #9aa8bd;
+
+    --accent: #f5b301;       /* lane-marking yellow: the main action colour */
+    --accent-hover: #ffc72e;
+    --accent-active: #dca000;
+    --on-accent: #161100;
+
+    --link: #1d4ed8;
+    --link-hover: #1e3a8a;
+    --focus: #1d4ed8;
+
+    --success: #0b6b3a;
+    --success-bg: #e3f5eb;
+    --warning: #7a4a00;
+    --warning-bg: #fff1cf;
+    --danger: #b42318;
+    --danger-bg: #fdecea;
+    --danger-btn: #b42318;
+    --danger-btn-hover: #8f1c12;
+
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-lg: 18px;
+
+    --shadow-sm: 0 1px 2px rgba(15, 23, 34, 0.08), 0 2px 8px rgba(15, 23, 34, 0.05);
+    --shadow: 0 2px 4px rgba(15, 23, 34, 0.06), 0 12px 28px rgba(15, 23, 34, 0.1);
+    --shadow-lg: 0 8px 16px rgba(15, 23, 34, 0.12), 0 28px 60px rgba(15, 23, 34, 0.22);
+
+    --header-h: 68px;
+    --container: 1140px;
+    --gutter: clamp(1rem, 4vw, 2rem);
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --bg: #0a0e14;
+    --surface: #121821;
+    --surface-2: #1a2230;
+    --text: #e9eef6;
+    --text-muted: #a1aec2;
+    --border: #2a3548;
+
+    --ink: #060910;
+    --on-ink: #e9eef6;
+    --on-ink-muted: #9aa8bd;
+
+    --link: #8db4ff;
+    --link-hover: #b9d0ff;
+    --focus: #8db4ff;
+
+    --success: #5fd49a;
+    --success-bg: #0f2a1d;
+    --warning: #f6c453;
+    --warning-bg: #2b2108;
+    --danger: #ff8a80;
+    --danger-bg: #331412;
+    --danger-btn: #d32f2f;
+    --danger-btn-hover: #e5484d;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 12px 28px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5), 0 28px 60px rgba(0, 0, 0, 0.7);
+}
+
+/* Visitors with JavaScript off still get the dark palette if their system is dark. */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+        color-scheme: dark;
+
+        --bg: #0a0e14;
+        --surface: #121821;
+        --surface-2: #1a2230;
+        --text: #e9eef6;
+        --text-muted: #a1aec2;
+        --border: #2a3548;
+        --ink: #060910;
+        --link: #8db4ff;
+        --link-hover: #b9d0ff;
+        --focus: #8db4ff;
+        --success: #5fd49a;
+        --success-bg: #0f2a1d;
+        --warning: #f6c453;
+        --warning-bg: #2b2108;
+        --danger: #ff8a80;
+        --danger-bg: #331412;
+        --danger-btn: #d32f2f;
+        --danger-btn-hover: #e5484d;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+        --shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 12px 28px rgba(0, 0, 0, 0.5);
+        --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5), 0 28px 60px rgba(0, 0, 0, 0.7);
+    }
+}
+
+/* ---------- Reset ---------- */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-padding-top: calc(var(--header-h) + 16px);
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+main {
+    flex: 1 0 auto;
+    width: 100%;
+}
+
+main:focus {
+    outline: none; /* main is only a programmatic focus target for the skip link */
+}
+
+img,
+svg,
+video {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+dialog {
+    margin: auto; /* the universal reset above would otherwise un-centre dialogs */
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* ---------- Typography ---------- */
+
+h1,
+h2,
+h3,
+h4 {
+    font-family: var(--font-display);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: var(--text);
+}
+
+h1 {
+    font-size: clamp(2.1rem, 5vw, 3.4rem);
+    font-weight: 800;
+}
+
+h2 {
+    font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+    font-weight: 800;
+}
+
+h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+p {
+    max-width: 68ch;
+}
+
+a {
+    color: var(--link);
+    text-underline-offset: 0.2em;
+}
+
+a:hover {
+    color: var(--link-hover);
+}
+
+code,
+pre {
+    font-family: var(--font-mono);
+}
+
+mark {
+    background: color-mix(in srgb, var(--accent) 45%, transparent);
+    color: inherit;
+    border-radius: 3px;
+    padding: 0 0.1em;
+}
+
+/* ---------- Focus (keyboard users) ---------- */
+
+:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+}
+
+/* ---------- Layout helpers ---------- */
+
+.container {
+    width: 100%;
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+}
+
+.page {
+    padding-block: clamp(1.75rem, 5vw, 3.5rem) 1rem;
+}
+
+.page-head {
+    margin-bottom: 1.75rem;
+}
+
+.page-head p {
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+}
+
+.visually-hidden {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* The yellow dashed centre line is BodaLink's one decorative motif. */
+.lane-line {
+    height: 6px;
+    background: repeating-linear-gradient(90deg, var(--accent) 0 28px, transparent 28px 52px);
+}
+
+/* ---------- Skip link ---------- */
+
+.skip-link {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 300;
+    padding: 0.7rem 1.1rem;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transform: translateY(-200%);
+    transition: transform 0.15s ease;
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+.skip-link:hover {
+    background: var(--accent-hover);
+    color: var(--on-accent);
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 46px;
+    padding: 0.6rem 1.3rem;
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease,
+        transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn--primary {
+    background: var(--accent);
+    color: var(--on-accent);
+}
+
+.btn--primary:hover {
+    background: var(--accent-hover);
+    color: var(--on-accent);
+    box-shadow: 0 4px 14px rgba(245, 179, 1, 0.35);
+}
+
+.btn--primary:active {
+    background: var(--accent-active);
+    box-shadow: none;
+}
+
+.btn--secondary {
+    background: var(--surface-2);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+.btn--secondary:hover {
+    background: var(--surface);
+    border-color: var(--text-muted);
+    color: var(--text);
+}
+
+.btn--ghost {
+    background: transparent;
+    color: var(--text);
+    border-color: var(--border);
+}
+
+.btn--ghost:hover {
+    background: var(--surface-2);
+    border-color: var(--text-muted);
+    color: var(--text);
+}
+
+.btn--danger {
+    background: var(--danger-btn);
+    color: #ffffff;
+}
+
+.btn--danger:hover {
+    background: var(--danger-btn-hover);
+    color: #ffffff;
+}
+
+.btn--on-dark {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.55);
+}
+
+.btn--on-dark:hover {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+.btn--sm {
+    min-height: 38px;
+    padding: 0.4rem 0.95rem;
+    font-size: 0.95rem;
+}
+
+.btn--lg {
+    min-height: 52px;
+    padding: 0.75rem 1.6rem;
+    font-size: 1.05rem;
+}
+
+.btn--block {
+    width: 100%;
+}
+
+.btn[disabled],
+.btn[aria-disabled="true"] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.btn[disabled]:hover,
+.btn[aria-disabled="true"]:hover {
+    box-shadow: none;
+}
+
+.btn.is-loading {
+    pointer-events: none;
+}
+
+.btn.is-loading::before,
+.spinner {
+    content: "";
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+.spinner {
+    flex-shrink: 0;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ---------- Icon buttons (header tools, close buttons) ---------- */
+
+.icon-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.icon-btn:hover {
+    background: var(--surface-2);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.icon-btn:active {
+    transform: scale(0.95);
+}
+
+.icon-btn svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ---------- Forms ---------- */
+
+.field {
+    display: grid;
+    gap: 0.4rem;
+    margin-bottom: 1.1rem;
+}
+
+.field label,
+.field .label {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.field .hint {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.input,
+.field input:not([type="file"]):not([type="checkbox"]):not([type="radio"]),
+.field select,
+.field textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.65rem 0.9rem;
+    background: var(--surface);
+    color: var(--text);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input:hover,
+.field input:not([type="file"]):hover,
+.field select:hover,
+.field textarea:hover {
+    border-color: var(--text-muted);
+}
+
+.input:focus-visible,
+.field input:focus-visible,
+.field select:focus-visible,
+.field textarea:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 1px;
+    border-color: var(--focus);
+}
+
+.input::placeholder,
+.field input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.85;
+}
+
+.field input[type="file"] {
+    padding: 0.5rem;
+    background: var(--surface);
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.field input[type="file"]:hover {
+    border-color: var(--text-muted);
+}
+
+.field input[type="file"]::file-selector-button {
+    margin-right: 0.75rem;
+    padding: 0.45rem 0.9rem;
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.field input[type="file"]::file-selector-button:hover {
+    background: var(--border);
+}
+
+.field-error,
+.form-error {
+    color: var(--danger);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.field input[aria-invalid="true"] {
+    border-color: var(--danger);
+}
+
+/* Alert box used for form errors and notices */
+.alert {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.25rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid currentColor;
+    font-weight: 600;
+    font-size: 0.97rem;
+}
+
+.alert--error {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+.alert--success {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+/* Cards */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

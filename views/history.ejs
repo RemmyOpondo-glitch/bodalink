@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("partials/head", {
+        title: "Trip history – BodaLink",
+        description: "Your past and active BodaLink rides, with total rides booked and total fare spent.",
+        styles: ["history.css"],
+        noindex: true
+    }) %>
+</head>
+<body>
+
+    <%- include("partials/navbar") %>
+
+    <main id="main-content" tabindex="-1" class="container page">
+
+        <section class="page-head">
+            <h1>My trip history</h1>
+            <p>Overview of all your past and active rides.</p>
+        </section>
+
+        <section class="history-stats" aria-label="Summary">
+            <div class="stat-card">
+                <span>Total rides booked</span>
+                <strong><%= stats.totalTrips %></strong>
+            </div>
+
+            <div class="stat-card">
+                <span>Total spent (fare)</span>
+                <strong>Ksh <%= stats.totalFare || 0 %></strong>
+            </div>
+        </section>
+
+        <% if (trips.length === 0) { %>
+            <section class="empty-history">
+                <h2>No trips booked yet</h2>
+                <p>When you request a ride, your booking details will appear here.</p>
+                <a href="/trips" class="btn btn--primary">Book your first ride</a>
+            </section>
+        <% } else { %>
+            <section class="history-table-wrapper">
+                <table class="history-table">
+                    <caption>Your trips, newest first</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Rider</th>
+                            <th scope="col">Stage</th>
+                            <th scope="col">Pickup</th>
+                            <th scope="col">Destination</th>
+                            <th scope="col">Distance</th>
+                            <th scope="col">Fare</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% trips.forEach(function (trip) {
+                            var status = String(trip.status || "").toLowerCase();
+                            var isPending = status === "pending"; %>
+                            <tr>
+                                <td data-label="Rider"><%= trip.rider_name %></td>
+                                <td data-label="Stage"><%= trip.stage %></td>
+                                <td data-label="Pickup"><%= trip.pickup %></td>
+                                <td data-label="Destination"><%= trip.destination %></td>
+                                <td data-label="Distance"><%= trip.distance %> km</td>
+                                <td data-label="Fare">Ksh <%= trip.fare %></td>
+                                <td data-label="Status">
+                                    <span class="badge badge--<%= isPending ? "pending" : "completed" %>"><%= isPending ? "Pending" : "Completed" %></span>
+                                </td>
+                                <td data-label="Action">
+                                    <% if (isPending) { %>
+                                        <form action="/complete/<%= trip.id %>" method="POST" class="complete-trip-form">
+                                            <button type="submit" class="btn btn--secondary btn--sm complete-trip"
+                                                    data-confirm="This marks the trip as completed and frees the rider for the next passenger. You can&rsquo;t undo it."
+                                                    data-confirm-title="Complete this trip?"
+                                                    data-confirm-label="Complete trip"
+                                                    data-loading-text="Completing…">Complete trip</button>
+                                        </form>
+                                    <% } else { %>
+                                        <span>Done</span>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </section>
+        <% } %>
+
+        <%- include("partials/last-updated", { updatedAt: updatedAt, updatedLive: true }) %>
+
+    </main>
+
+    <%- include("partials/footer") %>
+</body>
+</html>
