@@ -11,3 +11,5 @@ mobile/web-build/
 # User-uploaded profile photos
 public/uploads/
 !public/uploads/.gitkeep
+
+certificates/*
