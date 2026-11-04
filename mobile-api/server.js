@@ -14,26 +14,25 @@ require("dotenv").config({
 const app = express();
 const port = Number(process.env.PORT || process.env.MOBILE_API_PORT || 3002);
 const farePerKm = Number(process.env.FARE_PER_KM || 50);
+if (process.env.NODE_ENV === "production") {
+  const required = ["DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME", "DB_CA_CERT"];
+  const missing = required.filter((key) => !process.env[key]);
+  if (missing.length) throw new Error(`Missing required production environment variables: ${missing.join(", ")}`);
+}
 
 // --------------------------------------------------
 // DATABASE CONNECTION
 // --------------------------------------------------
 
+const localCaPath = path.join(__dirname, "../certificates/ca.pem");
+const databaseCa = process.env.DB_CA_CERT || (fs.existsSync(localCaPath) ? fs.readFileSync(localCaPath, "utf8") : undefined);
 const db = mysql.createConnection({
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
   password: process.env.DB_PASSWORD || "",
   database: process.env.DB_NAME || "bodalink",
   port: Number(process.env.DB_PORT || 3306),
-
-  ssl: process.env.DB_HOST
-    ? {
-        ca: fs.readFileSync(
-          path.join(__dirname, "../certificates/ca.pem")
-        ),
-        rejectUnauthorized: true
-      }
-    : undefined
+  ssl: process.env.DB_HOST ? { ca: databaseCa, rejectUnauthorized: true } : undefined
 });
 
 db.connect((err) => {
@@ -206,9 +205,9 @@ async function auth(req, res, next) {
 // --------------------------------------------------
 
 app.get("/api/health", (req, res) => {
-  res.json({
-    status: "ok",
-    service: "BodaLink mobile API"
+  db.query("SELECT 1 FROM api_tokens LIMIT 1", (err) => {
+    if (err) return res.status(503).json({ status: "unavailable", service: "BodaLink mobile API" });
+    res.json({ status: "ok", service: "BodaLink mobile API", database: "connected" });
   });
 });
 

@@ -1,5 +1,8 @@
 //IMPORTS
+require("dotenv").config();
 const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
 const express = require("express");
 const mysql = require("mysql2");
 const session = require("express-session");
@@ -8,16 +11,28 @@ const multer = require("multer"); //for importing images from forms
 const { FARE_PER_KM, contact, faqs, pages, pageUpdated } = require("./lib/content");
 
 const app = express();
-const port = 3001;
+const port = Number(process.env.PORT || 3001);
+
+if (process.env.NODE_ENV === "production") {
+  const required = ["SESSION_SECRET", "DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME", "DB_CA_CERT", "CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"];
+  const missing = required.filter((key) => !process.env[key]);
+  if (missing.length) throw new Error(`Missing required production environment variables: ${missing.join(", ")}`);
+}
+
+const localCaPath = path.join(__dirname, "certificates", "ca.pem");
+const databaseCa = process.env.DB_CA_CERT || (fs.existsSync(localCaPath) ? fs.readFileSync(localCaPath, "utf8") : undefined);
+const dbConfig = {
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "bodalink",
+  port: Number(process.env.DB_PORT || 3306),
+  ...(process.env.DB_HOST ? { ssl: { ca: databaseCa, rejectUnauthorized: true } } : {}),
+};
 
 //DATABASE CONNECTION
 
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "bodalink",
-});
+const db = mysql.createConnection(dbConfig);
 
 db.connect((err) => {
   if (err) {
@@ -36,6 +51,15 @@ db.connect((err) => {
         if (tableErr) console.log(tableErr);
       },
     );
+    db.query(
+      `CREATE TABLE IF NOT EXISTS web_sessions (
+        session_id VARCHAR(128) NOT NULL PRIMARY KEY,
+        expires BIGINT UNSIGNED NOT NULL,
+        data MEDIUMTEXT NOT NULL,
+        INDEX idx_web_sessions_expires (expires)
+      ) ENGINE=InnoDB`,
+      (sessionErr) => { if (sessionErr) console.error("Could not initialize web sessions:", sessionErr.message); },
+    );
   }
 });
 
@@ -53,50 +77,92 @@ app.use(express.urlencoded({ extended: true })); //read forms
 
 app.use(express.static("public"));
 
-app.use(
-  session({
-    secret: "bodalinksecret",
-    resave: false,
-    saveUninitialized: false,
-  }),
-);
+// MySQL-backed session store: sessions survive Render restarts and deployments.
+class MySQLSessionStore extends session.Store {
+  get(sid, callback) {
+    db.query("SELECT expires, data FROM web_sessions WHERE session_id = ?", [sid], (err, rows) => {
+      if (err) return callback(err);
+      if (!rows.length) return callback(null, null);
+      if (Number(rows[0].expires) <= Date.now()) {
+        this.destroy(sid, () => callback(null, null));
+        return;
+      }
+      try { callback(null, JSON.parse(rows[0].data)); }
+      catch (parseError) { callback(parseError); }
+    });
+  }
+  set(sid, sessionData, callback = () => {}) {
+    const expires = sessionData.cookie && sessionData.cookie.expires
+      ? new Date(sessionData.cookie.expires).getTime()
+      : Date.now() + 24 * 60 * 60 * 1000;
+    db.query(
+      `INSERT INTO web_sessions (session_id, expires, data) VALUES (?, ?, ?)
+       ON DUPLICATE KEY UPDATE expires = VALUES(expires), data = VALUES(data)`,
+      [sid, expires, JSON.stringify(sessionData)], callback
+    );
+  }
+  touch(sid, sessionData, callback = () => {}) { this.set(sid, sessionData, callback); }
+  destroy(sid, callback = () => {}) {
+    db.query("DELETE FROM web_sessions WHERE session_id = ?", [sid], callback);
+  }
+}
+const sessionStore = new MySQLSessionStore();
 
-//where multer will store the files
-const storage = multer.diskStorage({
-  destination: (req, file, cb)=>{
-    cb(null, "public/uploads");
+app.set("trust proxy", 1);
+app.use(session({
+  name: "bodalink.sid",
+  secret: process.env.SESSION_SECRET || "bodalink-local-development-secret",
+  store: sessionStore,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 24 * 60 * 60 * 1000,
   },
+}));
 
-  //giving the filename
-  filename: (req, file, cb)=>{
-    const uniqueName= Date.now() + "-" + file.originalname;
-
-    cb(null,uniqueName);
-  }
-
-  
-});
-//filtering the profile image uploaded
-const fileFilter = (req, file, cb)=>{
-  if(
-    file.mimetype === "image/jpeg"||
-    file.mimetype === "image/png"||
-    file.mimetype === "image/webp"
-  ){
-    cb(null,true);
-  }
-  else{
-    const error = new Error("Only JPEG, PNG and WEBP images are allowed.");
-    error.status = 400;
-    cb(error);
-  }
+// Local development stores photos on disk. Production uses memory so files can be sent to Cloudinary.
+const localUploadDir = path.join(__dirname, "public", "uploads");
+if (!fs.existsSync(localUploadDir)) fs.mkdirSync(localUploadDir, { recursive: true });
+const storage = process.env.NODE_ENV === "production"
+  ? multer.memoryStorage()
+  : multer.diskStorage({
+      destination: (req, file, cb) => cb(null, localUploadDir),
+      filename: (req, file, cb) => cb(null, `${Date.now()}-${crypto.randomBytes(6).toString("hex")}${path.extname(file.originalname).toLowerCase()}`),
+    });
+const fileFilter = (req, file, cb) => {
+  if (["image/jpeg", "image/png", "image/webp"].includes(file.mimetype)) cb(null, true);
+  else { const error = new Error("Only JPEG, PNG and WEBP images are allowed."); error.status = 400; cb(error); }
 };
+const upload = multer({ storage, fileFilter, limits: { fileSize: 2 * 1024 * 1024 } });
 
-const upload = multer({
-  storage:storage,
-  fileFilter:fileFilter,
-  limits:{fileSize:2*1024*1024} //limits to 2MB
-})
+async function saveProfilePhoto(file) {
+  if (!file) return null;
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  if (cloudName && apiKey && apiSecret) {
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const folder = "bodalink/profiles";
+    const signature = crypto.createHash("sha1")
+      .update(`folder=${folder}&timestamp=${timestamp}${apiSecret}`)
+      .digest("hex");
+    const form = new FormData();
+    form.append("api_key", apiKey);
+    form.append("timestamp", timestamp);
+    form.append("folder", folder);
+    form.append("signature", signature);
+    form.append("file", new Blob([file.buffer], { type: file.mimetype }), file.originalname);
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: "POST", body: form });
+    const result = await response.json();
+    if (!response.ok || !result.secure_url) throw new Error(result.error?.message || "Profile photo upload failed.");
+    return result.secure_url;
+  }
+  if (process.env.NODE_ENV === "production") throw new Error("Profile photo storage is not configured. Please try again later.");
+  return file.filename;
+}
 
 //Runs the photo upload and shows upload problems on the sign-up form instead of crashing
 function uploadProfilePhoto(req, res, next) {
@@ -177,6 +243,14 @@ app.get("/favicon.ico", (req, res) => {
   res.redirect(301, "/favicon.svg");
 });
 
+// Render health check endpoint.
+app.get("/healthz", (req, res) => {
+  db.query("SELECT 1 FROM web_sessions LIMIT 1", (err) => {
+    if (err) return res.status(503).json({ status: "unavailable", service: "BodaLink website" });
+    res.status(200).json({ status: "ok", service: "BodaLink website", database: "connected" });
+  });
+});
+
 //HOMEROUTES
 
 app.get("/", (req, res, next) => {
@@ -201,10 +275,10 @@ app.get("/signup", (req, res) => {
 app.post("/signup", uploadProfilePhoto, async (req, res, next) => {
 
   const { phone, password } = req.body;
-  const profilePhoto= req.file ? req.file.filename :null; //Was a file uploaded? Yes → filename, No  → null 
+  let profilePhoto = null;
 
   function removeUploadedFile() {
-    if (req.file) fs.unlink(req.file.path, () => {});
+    if (req.file?.path) fs.unlink(req.file.path, () => {});
   }
 
   if (typeof phone !== "string" || typeof password !== "string" || !phone.trim() || !password) {
@@ -233,6 +307,7 @@ app.post("/signup", uploadProfilePhoto, async (req, res, next) => {
       }
 
       try {
+        profilePhoto = await saveProfilePhoto(req.file);
         const hashedPassword = await bcrypt.hash(password, 10);
 
         db.query(
@@ -784,6 +859,6 @@ app.use((err, req, res, next) => {
 });
 
 //START SERVER
-app.listen(port, (req, res) => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`Server is listening to port ${port}`);
 });

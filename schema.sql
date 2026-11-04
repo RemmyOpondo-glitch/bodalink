@@ -40,3 +40,23 @@ CREATE TABLE IF NOT EXISTS newsletter_subscribers (
     email VARCHAR(254) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+-- Native mobile API authentication tokens (only token hashes are stored).
+CREATE TABLE IF NOT EXISTS api_tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token_hash CHAR(64) NOT NULL UNIQUE,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_api_tokens_user_id (user_id),
+    CONSTRAINT fk_api_tokens_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Persistent website login sessions.
+CREATE TABLE IF NOT EXISTS web_sessions (
+    session_id VARCHAR(128) NOT NULL PRIMARY KEY,
+    expires BIGINT UNSIGNED NOT NULL,
+    data MEDIUMTEXT NOT NULL,
+    INDEX idx_web_sessions_expires (expires)
+) ENGINE=InnoDB;

@@ -33,7 +33,7 @@
                 <% if (user) { %>
                     <a class="avatar-link" href="/profile" aria-label="My profile"<%- _current("/profile") %>>
                         <% if (user.profile_photo) { %>
-                            <img src="/uploads/<%= user.profile_photo %>" alt="" class="profile-photo" width="40" height="40">
+                            <img src="<%= /^https?:\/\//i.test(user.profile_photo) ? user.profile_photo : '/uploads/' + user.profile_photo %>" alt="" class="profile-photo" width="40" height="40">
                         <% } else { %>
                             <span class="profile-placeholder" aria-hidden="true">
                                 <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>

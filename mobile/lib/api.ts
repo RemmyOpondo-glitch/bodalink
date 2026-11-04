@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-const API_URL=(process.env.EXPO_PUBLIC_API_URL||"http://192.168.100.36:3002/api").replace(/\/+$/g,"");const TOKEN_KEY="bodalink_token";
+const API_URL=(process.env.EXPO_PUBLIC_API_URL||"https://bodalink-api.onrender.com/api").replace(/\/+$/g,"");const TOKEN_KEY="bodalink_token";
 export type User={id:number;phone:string;profilePhoto:string|null};export type Rider={id:number;name:string;stage:string;available:number|boolean};export type Trip={id:number;pickup:string;destination:string;distance:number|string;fare:number|string;status:string;created_at:string;rider_name:string;stage:string;rider_id?:number};
 async function request<T>(path:string,options:RequestInit={}):Promise<T>{const token=await AsyncStorage.getItem(TOKEN_KEY);const response=await fetch(`${API_URL}${path}`,{...options,headers:{Accept:"application/json","Content-Type":"application/json",...(token?{Authorization:`Bearer ${token}`} : {}),...(options.headers||{})}});const payload=await response.json().catch(()=>({}));if(!response.ok)throw new Error(payload.message||`Request failed (${response.status})`);return payload as T;}
 export const saveToken=(token:string)=>AsyncStorage.setItem(TOKEN_KEY,token);export const clearToken=()=>AsyncStorage.removeItem(TOKEN_KEY);export const getToken=()=>AsyncStorage.getItem(TOKEN_KEY);

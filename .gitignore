@@ -13,3 +13,10 @@ public/uploads/
 !public/uploads/.gitkeep
 
 certificates/*
+# Local credentials, database certificates and uploaded user media
+.env
+.env.*
+!.env.example
+certificates/
+public/uploads/*
+!public/uploads/.gitkeep

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   ImageBackground,
   Pressable,
   SafeAreaView,
@@ -10,33 +9,18 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { Redirect, router } from "expo-router";
+import { router } from "expo-router";
 import { getToken } from "../lib/api";
-import { theme } from "../theme";
 
 export default function LandingScreen() {
-  const [destination, setDestination] = useState<"/(tabs)" | null>(null);
-  const [checking, setChecking] = useState(true);
+  const [hasToken, setHasToken] = useState(false);
   const { height, width } = useWindowDimensions();
   const compact = height < 760;
 
   useEffect(() => {
-    getToken()
-      .then((token) => {
-        if (token) setDestination("/(tabs)");
-        setChecking(false);
-      })
-      .catch(() => setChecking(false));
+    getToken().then((token) => setHasToken(Boolean(token))).catch(() => setHasToken(false));
   }, []);
 
-  if (destination) return <Redirect href={destination} />;
-  if (checking) {
-    return (
-      <View style={styles.loading}>
-        <ActivityIndicator size="large" color={theme.colors.accent} />
-      </View>
-    );
-  }
 
   return (
     <View style={styles.screen}>
@@ -67,22 +51,20 @@ export default function LandingScreen() {
                 <Text style={styles.tagline}>Safe Rides. Better Journeys.</Text>
               </View>
               <View style={styles.authButtons}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Log in"
-                  style={({ pressed }) => [styles.loginButton, pressed && styles.pressed]}
-                  onPress={() => router.push({ pathname: "/auth", params: { mode: "login" } })}
-                >
-                  <Text style={styles.loginText}>Log In</Text>
-                </Pressable>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Create account"
-                  style={({ pressed }) => [styles.signupButton, pressed && styles.pressed]}
-                  onPress={() => router.push({ pathname: "/auth", params: { mode: "signup" } })}
-                >
-                  <Text style={styles.signupText}>Create Account</Text>
-                </Pressable>
+                {hasToken ? (
+                  <Pressable accessibilityRole="button" style={({ pressed }) => [styles.signupButton, pressed && styles.pressed]} onPress={() => router.replace("/(tabs)")}>
+                    <Text style={styles.signupText}>Continue</Text>
+                  </Pressable>
+                ) : (
+                  <>
+                    <Pressable accessibilityRole="button" accessibilityLabel="Log in" style={({ pressed }) => [styles.loginButton, pressed && styles.pressed]} onPress={() => router.push({ pathname: "/auth", params: { mode: "login" } })}>
+                      <Text style={styles.loginText}>Log In</Text>
+                    </Pressable>
+                    <Pressable accessibilityRole="button" accessibilityLabel="Create account" style={({ pressed }) => [styles.signupButton, pressed && styles.pressed]} onPress={() => router.push({ pathname: "/auth", params: { mode: "signup" } })}>
+                      <Text style={styles.signupText}>Create Account</Text>
+                    </Pressable>
+                  </>
+                )}
               </View>
             </View>
 
@@ -96,7 +78,7 @@ export default function LandingScreen() {
               <Pressable
                 accessibilityRole="button"
                 style={({ pressed }) => [styles.primaryButton, pressed && styles.pressed]}
-                onPress={() => router.push({ pathname: "/auth", params: { mode: "login" } })}
+                onPress={() => hasToken ? router.replace("/(tabs)/book") : router.push({ pathname: "/auth", params: { mode: "login" } })}
               >
                 <Text style={styles.buttonIconDark}>♧</Text>
                 <Text style={styles.primaryButtonText}>Book a Ride</Text>
@@ -105,7 +87,7 @@ export default function LandingScreen() {
               <Pressable
                 accessibilityRole="button"
                 style={({ pressed }) => [styles.secondaryButton, pressed && styles.pressed]}
-                onPress={() => router.push("/(tabs)/book")}
+                onPress={() => hasToken ? router.replace("/(tabs)/book") : router.push({ pathname: "/auth", params: { mode: "login" } })}
               >
                 <Text style={styles.buttonIconLight}>⌖</Text>
                 <Text style={styles.secondaryButtonText}>Find Riders</Text>
@@ -126,9 +108,9 @@ export default function LandingScreen() {
 
           <View style={styles.bottomNav}>
             <Pressable style={styles.navItem} onPress={() => {}}><Text style={[styles.navIcon, styles.activeNav]}>⌂</Text><Text style={[styles.navLabel, styles.activeNav]}>Home</Text></Pressable>
-            <Pressable style={styles.navItem} onPress={() => router.push("/(tabs)/book")}><Text style={styles.navIcon}>⌕</Text><Text style={styles.navLabel}>Book</Text></Pressable>
-            <Pressable style={styles.navItem} onPress={() => router.push("/(tabs)/history")}><Text style={styles.navIcon}>◷</Text><Text style={styles.navLabel}>History</Text></Pressable>
-            <Pressable style={styles.navItem} onPress={() => router.push("/(tabs)/profile")}><Text style={styles.navIcon}>♙</Text><Text style={styles.navLabel}>Profile</Text></Pressable>
+            <Pressable style={styles.navItem} onPress={() => hasToken ? router.push("/(tabs)/book") : router.push({ pathname: "/auth", params: { mode: "login" } })}><Text style={styles.navIcon}>⌕</Text><Text style={styles.navLabel}>Book</Text></Pressable>
+            <Pressable style={styles.navItem} onPress={() => hasToken ? router.push("/(tabs)/history") : router.push({ pathname: "/auth", params: { mode: "login" } })}><Text style={styles.navIcon}>◷</Text><Text style={styles.navLabel}>History</Text></Pressable>
+            <Pressable style={styles.navItem} onPress={() => hasToken ? router.push("/(tabs)/profile") : router.push({ pathname: "/auth", params: { mode: "login" } })}><Text style={styles.navIcon}>♙</Text><Text style={styles.navLabel}>Profile</Text></Pressable>
           </View>
         </View>
       </SafeAreaView>
@@ -137,9 +119,8 @@ export default function LandingScreen() {
 }
 
 const styles = StyleSheet.create({
-  loading: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#07111D" },
   screen: { flex: 1, backgroundColor: "#07111D" },
-  photoTint: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(3, 10, 19, 0.28)" },
+  photoTint: { ...StyleSheet.absoluteFill, backgroundColor: "rgba(3, 10, 19, 0.28)" },
   bottomShade: { position: "absolute", left: 0, right: 0, bottom: 0, height: "48%", backgroundColor: "rgba(3, 10, 19, 0.62)" },
   safe: { flex: 1 },
   page: { flex: 1 },

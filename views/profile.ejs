@@ -16,7 +16,7 @@
 
         <section class="card profile-card">
             <% if (user.profile_photo) { %>
-                <img class="profile-card__photo" src="/uploads/<%= user.profile_photo %>" alt="Your profile photo" width="132" height="132">
+                <img class="profile-card__photo" src="<%= /^https?:\/\//i.test(user.profile_photo) ? user.profile_photo : '/uploads/' + user.profile_photo %>" alt="Your profile photo" width="132" height="132">
             <% } else { %>
                 <div class="profile-card__placeholder" aria-hidden="true">
                     <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
